@@ -61,7 +61,7 @@ views:
   - !include weather-radar-search.yaml
 
 - theme: Backend-selected
-  title: Cincinnati
+  title: Home
   path: home
   type: sidebar
   cards:
