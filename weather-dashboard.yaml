@@ -1,0 +1,71 @@
+title: Weather
+button_card_templates: !include button-card-templates.yaml
+views:
+- theme: Backend-selected
+  title: Local
+  path: local
+  type: sidebar
+  cards:
+  - !include weather-overview-local.yaml
+  - !include weather-forecast-hourly-local.yaml
+  - !include weather-forecast-daily-local.yaml
+  - !include weather-radar-local.yaml
+
+- theme: Backend-selected
+  title: Search
+  path: search
+  type: sidebar
+  cards:
+  - type: custom:layout-card
+    layout_type: custom:grid-layout
+    layout:
+      grid-template-columns: auto 96px
+    cards:
+    - type: entities
+      entities: 
+        - entity: input_text.weather_search_location
+          name: Location
+    - type: custom:button-card
+      entity: input_button.weather_search_refresh
+      aspect_ratio: 1/1
+      size: 50%
+      show_name: false
+      tap_action:
+        action: toggle
+      color_type: icon
+      color: var(--paper-item-icon-color)
+  - type: markdown
+    content: >
+      {%- set timenow = now()|as_timestamp -%}
+      {%- set updated = state_attr('sensor.weather_search_api', 'currently').time -%}
+      {%- set lastupdated = ((timenow - updated) / 60 )|round -%}
+      {%- if lastupdated <= 1 -%}
+        {{ "Just updated" }}
+      {%- else -%}
+        {{ "Updated " ~ lastupdated ~ " minutes ago" }}
+      {%- endif -%}
+    card_mod:
+      style: |
+        ha-card {
+          background: none;
+        }
+        ha-card ha-markdown.no-header {
+          padding: 0 0 5px !important;
+          text-align: center;
+          font-size: 10px;
+          line-height: 1;
+        }
+  - !include weather-overview-search.yaml
+  - !include weather-forecast-hourly-search.yaml
+  - !include weather-forecast-daily-search.yaml
+  - !include weather-radar-search.yaml
+
+- theme: Backend-selected
+  title: Cincinnati
+  path: home
+  type: sidebar
+  cards:
+  - !include weather-overview-home.yaml
+  - !include weather-forecast-hourly-home.yaml
+  - !include weather-forecast-daily-home.yaml
+  - !include weather-radar-home.yaml
