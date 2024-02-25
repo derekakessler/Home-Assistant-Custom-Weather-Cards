@@ -5,7 +5,7 @@
 
 - data source: Pirate Weather
 - current weather: button-card pulling on the PW sensor attributes to fill out the custom_fields options
-- forecasts: markdown card with table of time/date, temps, conditions, precipitation%, dew point, and wind speed
+- forecasts: markdown card with overflow-scrolling table of time/date, temps, conditions, precipitation%, dew point, and wind speed
 - styling:
   - current weather: button-card styles with JS checking the conditions to call a background-image that is overlaid on a color to match the temperature (cold blue to comfortable green to hot red)
   - forecasts: card-mod to apply CSS to the tables and generate swoopy SVG background ribbons of the temperature gradient (daily is highs and lows) and the precipitation accumulation for that period (the vertical lines).
@@ -20,6 +20,15 @@ The "Search" tab is a special one. The location is an input_text field. When cha
 ![screenshot 2024-02-24 at 21 00 13](https://github.com/derekakessler/Home-Assistant-Custom-Weather-Cards/assets/1646121/784fa1b4-2610-439f-b9fc-f9ec70bda461)
 
 This is all driven by the Pirate Weather sensor attributes and the incredible amount of data it pulls from NOAA. These are fed into a slew of Jinja for loops to generate the tables and pull the data to determine the curve points and controls for the temperature and precipitation ribbons.
+
+### Notes
+
+- Because this is using NOAA weather data, all units are in degrees Farenheight / miles / etc. If you use a different weather source or prefer a different measuring system you will need to adapt the code.
+- The temperature ribbon bottoms out at 0 (well, 1 so there is always _something_ showing) and maxes out at 100.
+- The hourly temperature ribbon's color gradient is horizontal and is determined by that hour's temperature, so as the height increases the color changes from blue to green to red.
+- The daily temperature ribbon's color gradient is vertical and is determined by the overall min and max temperatures.
+- The precipitation likelihood numbers show icons based on the precipType attribute, and only display if the chance is > 0%.
+- All color choices were made with the intent of working on a dark theme. The temperature ribbons work pretty nicely on a light theme, but the color of the precipitation ribbon may need to be changed for visibility if you prefer a lighter theme.
 
 ### Dependencies
 
