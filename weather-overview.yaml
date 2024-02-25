@@ -1,0 +1,5 @@
+type: custom:button-card
+entity: sensor.weather_home_api
+template: weather
+variables:
+  location: home
