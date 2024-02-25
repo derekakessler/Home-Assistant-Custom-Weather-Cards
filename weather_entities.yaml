@@ -1,0 +1,66 @@
+rest:
+  - authentication: basic
+    scan_interval: 600
+    resource: 'https://api.pirateweather.net/forecast/<API-KEY>/39.155985815671116,-84.47303847702554'
+    sensor:
+      - name: "Weather Home API"
+        icon: mdi:code-json
+        value_template: '{{ value_json.currently.temperature|float }}'
+        state_class: measurement
+        unit_of_measurement: 'ºF'
+        json_attributes:
+          - latitude
+          - longitude
+          - currently
+          - alerts
+          - daily
+          - hourly
+          - minutely
+
+  - authentication: basic
+    scan_interval: 600
+    resource_template: 'https://api.pirateweather.net/forecast/<API-KEY>/{{state_attr("device_tracker.<PHONE>", "latitude")}},{{state_attr("device_tracker.<PHONE>", "longitude")}}'
+    sensor:
+      - name: "Weather Local API"
+        icon: mdi:code-json
+        value_template: '{{ value_json.currently.temperature|float }}'
+        state_class: measurement
+        unit_of_measurement: 'ºF'
+        json_attributes:
+          - latitude
+          - longitude
+          - currently
+          - alerts
+          - daily
+          - hourly
+          - minutely
+
+  - authentication: basic
+    scan_interval: 3600
+    resource_template: 'https://api.pirateweather.net/forecast/<API-KEY>/{{states("input_text.weather_search_coordinates")}}'
+    sensor:
+      - name: "Weather Search API"
+        icon: mdi:code-json
+        value_template: '{{ value_json.currently.temperature|float }}'
+        state_class: measurement
+        unit_of_measurement: 'ºF'
+        json_attributes:
+          - latitude
+          - longitude
+          - currently
+          - alerts
+          - daily
+          - hourly
+          - minutely
+
+input_text:
+  weather_search_coordinates:
+    min: 0
+    max: 255
+
+  weather_search_location:
+    min: 0
+    max: 255
+
+input_button:
+  weather_search_refresh
