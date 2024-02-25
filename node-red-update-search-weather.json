@@ -1,0 +1,361 @@
+[
+    {
+        "id": "244a3d17cf2add29",
+        "type": "group",
+        "z": "0dd895e32e53a3a3",
+        "name": "Weather Search Location Set",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "2077893e28e28a9b",
+            "5f95c20242b8e937",
+            "13ce852ae5517e3e",
+            "733434b45f90d5dd",
+            "593459cf16bd692c",
+            "b50795a4f35cb2ed",
+            "4b0e688f96744ce8",
+            "e745931728f34b08",
+            "0a7c573ef837be7f"
+        ],
+        "x": 14,
+        "y": 2159,
+        "w": 752,
+        "h": 222
+    },
+    {
+        "id": "2077893e28e28a9b",
+        "type": "api-call-service",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Refresh Button",
+        "server": "4f6bb28d.5ec92c",
+        "version": 5,
+        "debugenabled": false,
+        "domain": "input_button",
+        "service": "press",
+        "areaId": [],
+        "deviceId": [],
+        "entityId": [
+            "input_button.weather_search_refresh"
+        ],
+        "data": "",
+        "dataType": "jsonata",
+        "mergeContext": "",
+        "mustacheAltTags": false,
+        "outputProperties": [],
+        "queue": "none",
+        "x": 660,
+        "y": 2200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5f95c20242b8e937",
+        "type": "api-call-service",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Set Coordinates",
+        "server": "4f6bb28d.5ec92c",
+        "version": 5,
+        "debugenabled": false,
+        "domain": "input_text",
+        "service": "set_value",
+        "areaId": [],
+        "deviceId": [],
+        "entityId": [
+            "input_text.weather_search_coordinates"
+        ],
+        "data": "{\"value\": payload.lat & \",\" & payload.lon}",
+        "dataType": "jsonata",
+        "mergeContext": "",
+        "mustacheAltTags": false,
+        "outputProperties": [
+            {
+                "property": "sent",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "data"
+            }
+        ],
+        "queue": "none",
+        "x": 480,
+        "y": 2200,
+        "wires": [
+            [
+                "2077893e28e28a9b"
+            ]
+        ]
+    },
+    {
+        "id": "13ce852ae5517e3e",
+        "type": "server-state-changed",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Search Location",
+        "server": "4f6bb28d.5ec92c",
+        "version": 5,
+        "outputs": 1,
+        "exposeAsEntityConfig": "",
+        "entityId": "input_text.weather_search_location",
+        "entityIdType": "exact",
+        "outputInitially": false,
+        "stateType": "str",
+        "ifState": "",
+        "ifStateType": "str",
+        "ifStateOperator": "is",
+        "outputOnlyOnStateChange": true,
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "ignorePrevStateNull": false,
+        "ignorePrevStateUnknown": false,
+        "ignorePrevStateUnavailable": false,
+        "ignoreCurrentStateUnknown": false,
+        "ignoreCurrentStateUnavailable": false,
+        "outputProperties": [
+            {
+                "property": "destination",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            },
+            {
+                "property": "origin",
+                "propertyType": "msg",
+                "value": "45229",
+                "valueType": "str"
+            },
+            {
+                "property": "location.address",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "entityState"
+            }
+        ],
+        "x": 120,
+        "y": 2200,
+        "wires": [
+            [
+                "b50795a4f35cb2ed"
+            ]
+        ]
+    },
+    {
+        "id": "733434b45f90d5dd",
+        "type": "api-call-service",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Get Weather",
+        "server": "4f6bb28d.5ec92c",
+        "version": 5,
+        "debugenabled": false,
+        "domain": "homeassistant",
+        "service": "update_entity",
+        "areaId": [],
+        "deviceId": [],
+        "entityId": [
+            "{{payload.entity_id}}"
+        ],
+        "data": "",
+        "dataType": "jsonata",
+        "mergeContext": "",
+        "mustacheAltTags": false,
+        "outputProperties": [],
+        "queue": "none",
+        "x": 650,
+        "y": 2300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "593459cf16bd692c",
+        "type": "server-state-changed",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Search Refresh",
+        "server": "4f6bb28d.5ec92c",
+        "version": 5,
+        "outputs": 1,
+        "exposeAsEntityConfig": "",
+        "entityId": "input_button.weather_search_refresh",
+        "entityIdType": "exact",
+        "outputInitially": false,
+        "stateType": "str",
+        "ifState": "",
+        "ifStateType": "str",
+        "ifStateOperator": "is",
+        "outputOnlyOnStateChange": true,
+        "for": "0",
+        "forType": "num",
+        "forUnits": "minutes",
+        "ignorePrevStateNull": false,
+        "ignorePrevStateUnknown": false,
+        "ignorePrevStateUnavailable": false,
+        "ignoreCurrentStateUnknown": false,
+        "ignoreCurrentStateUnavailable": false,
+        "outputProperties": [
+            {
+                "property": "payload.entity_id",
+                "propertyType": "msg",
+                "value": "sensor.weather_search_api",
+                "valueType": "str"
+            }
+        ],
+        "x": 440,
+        "y": 2260,
+        "wires": [
+            [
+                "733434b45f90d5dd"
+            ]
+        ]
+    },
+    {
+        "id": "b50795a4f35cb2ed",
+        "type": "google geocoding",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Get Coordinates",
+        "geocodeBy": "address",
+        "address": "",
+        "lat": "",
+        "lon": "",
+        "googleAPI": "",
+        "bounds": "",
+        "language": "",
+        "region": "",
+        "components": "",
+        "x": 300,
+        "y": 2200,
+        "wires": [
+            [
+                "5f95c20242b8e937"
+            ]
+        ]
+    },
+    {
+        "id": "4b0e688f96744ce8",
+        "type": "server-state-changed",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "Weather update failed",
+        "server": "4f6bb28d.5ec92c",
+        "version": 5,
+        "outputs": 2,
+        "exposeAsEntityConfig": "",
+        "entityId": [
+            "sensor.weather_home_api",
+            "sensor.weather_local_api",
+            "sensor.weather_search_api"
+        ],
+        "entityIdType": "list",
+        "outputInitially": true,
+        "stateType": "str",
+        "ifState": "(unavailable|unknown)",
+        "ifStateType": "re",
+        "ifStateOperator": "is",
+        "outputOnlyOnStateChange": false,
+        "for": "1",
+        "forType": "num",
+        "forUnits": "minutes",
+        "ignorePrevStateNull": false,
+        "ignorePrevStateUnknown": false,
+        "ignorePrevStateUnavailable": false,
+        "ignoreCurrentStateUnknown": false,
+        "ignoreCurrentStateUnavailable": false,
+        "outputProperties": [
+            {
+                "property": "payload.entity_id",
+                "propertyType": "msg",
+                "value": "",
+                "valueType": "triggerId"
+            }
+        ],
+        "x": 420,
+        "y": 2300,
+        "wires": [
+            [
+                "733434b45f90d5dd"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e745931728f34b08",
+        "type": "link in",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "HA Start",
+        "links": [
+            "9a0ce3b9f162fa95"
+        ],
+        "x": 300,
+        "y": 2340,
+        "wires": [
+            [
+                "0a7c573ef837be7f"
+            ]
+        ],
+        "l": true
+    },
+    {
+        "id": "0a7c573ef837be7f",
+        "type": "ha-get-entities",
+        "z": "0dd895e32e53a3a3",
+        "g": "244a3d17cf2add29",
+        "name": "",
+        "server": "4f6bb28d.5ec92c",
+        "version": 1,
+        "rules": [
+            {
+                "property": "entity_id",
+                "logic": "is",
+                "value": "sensor\\.weather.*_api",
+                "valueType": "re"
+            },
+            {
+                "property": "state",
+                "logic": "is",
+                "value": "unknown",
+                "valueType": "str"
+            }
+        ],
+        "outputType": "split",
+        "outputEmptyResults": false,
+        "outputLocationType": "msg",
+        "outputLocation": "payload",
+        "outputResultsCount": 1,
+        "x": 450,
+        "y": 2340,
+        "wires": [
+            [
+                "733434b45f90d5dd"
+            ]
+        ]
+    },
+    {
+        "id": "4f6bb28d.5ec92c",
+        "type": "server",
+        "name": "Home Assistant",
+        "version": 5,
+        "addon": true,
+        "rejectUnauthorizedCerts": true,
+        "ha_boolean": "y|yes|true|on|home|open",
+        "connectionDelay": true,
+        "cacheJson": true,
+        "heartbeat": false,
+        "heartbeatInterval": 30,
+        "areaSelector": "friendlyName",
+        "deviceSelector": "friendlyName",
+        "entitySelector": "friendlyName",
+        "statusSeparator": "at: ",
+        "statusYear": "hidden",
+        "statusMonth": "short",
+        "statusDay": "numeric",
+        "statusHourCycle": "h23",
+        "statusTimeFormat": "h:m",
+        "enableGlobalContextStore": true
+    }
+]
