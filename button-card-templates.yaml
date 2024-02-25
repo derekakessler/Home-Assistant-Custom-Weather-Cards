@@ -1,0 +1,138 @@
+weather:
+  variables:
+    location: home
+  custom_fields:
+    currentTemp: >
+      [[[ return Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.currently.temperature) + 'º']]]
+    high: >
+      [[[ return 'High: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureHigh) + 'º' ]]]
+    low: >
+      [[[ return 'Low: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureLow) + 'º' ]]]
+    conditions: >
+      [[[
+        const iconMap = {
+            "clear-day": "mdi:weather-sunny",
+            "clear-night": "mdi:weather-night",
+            "rain": "mdi:weather-rainy",
+            "snow": "mdi:weather-snowy",
+            "fog": "mdi:weather-fog",
+            "sleet": "mdi:weather-snowy",
+            "wind": "mdi:weather-windy",
+            "cloudy": "mdi:weather-cloudy",
+            "partly-cloudy-day": "mdi:weather-partly-cloudy",
+            "partly-cloudy-night": "mdi:weather-night-partly-cloudy",
+            "hail": "mdi:weather-hail",
+            "lightning": "mdi:weather-lightning",
+            "thunderstorm": "mdi:weather-lightning-rainy"
+        };
+        const icon = states['sensor.weather_' + variables.location + '_api'].attributes.currently.icon;
+        const condition = iconMap[icon] ? `<ha-icon icon="${iconMap[icon]}"></ha-icon>` : '';
+        return condition;
+      ]]]
+    dewpoint: >
+      [[[ return 'Dewpoint: ' + Math.round(states['sensor.weather_' + variables.location +
+      '_api'].attributes.currently.dewPoint) + 'º']]]
+    wind: >
+      [[[ return 'Wind: ' + Math.round(states['sensor.weather_' + variables.location +
+      '_api'].attributes.currently.windSpeed) + 'mph']]]
+  show_icon: false
+  show_name: false
+  styles:
+    card:
+      - font-size: 16px
+      - padding: 10px 20px 0
+      - background-color: |
+          [[[
+            if (states['binary_sensor.night'].state == "on") return "var(--ha-card-background,var(--card-background-color,#fff))"; 
+            if (entity.state <= 0) return "var(--weather-background-color, hsl(300, 100%, " + (50 + (50 * (entity.state / -10 ))) + "%))";
+            if (entity.state <= 100) return "var(--weather-background-color, hsl(" + (300 - (200 * (entity.state / 66.6 ))) + ", 100%, 50%))";
+            else return "var(--weather-background-color, #ff0000)"
+          ]]]
+      - background-image: |
+          [[[
+            const conditionImages = {
+                "clear-day": "sunny-2000",
+                "clear-night": "sunny-2000",
+                "rain": "rain-2000",
+                "snow": "snowing-2",
+                "fog": "fog-200-1",
+                "sleet": "snowing-2",
+                "wind": "clouds-2000",
+                "cloudy": "clouds-2000",
+                "partly-cloudy-day": "clouds-2000",
+                "partly-cloudy-night": "clouds-2000",
+                "hail": "clouds-2000",
+                "lightning": "storm-2000-1",
+                "thunderstorm": "storm-2000-1"
+            };
+            const weatherIcon = states['sensor.weather_' + variables.location + '_api'].attributes.currently.icon;
+            const conditionImage = conditionImages[weatherIcon] || 'default-condition-image';
+            if (states['binary_sensor.night'].state == "on") return "none";
+            else return "var(--weather-background-image, url(/local/images/" + conditionImage + ".jpg))";
+          ]]]
+      - background-size: cover
+      - background-blend-mode: |
+          [[[
+            var weatherData = states['sensor.weather_' + variables.location + '_api'].attributes.currently;
+            var icon = weatherData.icon;
+            var temperature = weatherData.temperature;
+            if (icon == "clear-day" ||
+                icon == "clear-night" ||
+                icon == "cloudy" ||
+                icon == "partly-cloudy-day" ||
+                icon == "partly-cloudy-night") {
+                return "screen";
+            } else if (icon == "lightning" || icon == "thunderstorm") {
+                return "none";
+            } else if (temperature < 10) {
+                return "hard-light";
+            } else if (temperature < 28) {
+                return "screen";
+            } else if (temperature < 92) {
+                return "hard-light";
+            } else {
+                return "screen";
+            }
+          ]]]
+    grid:
+      - grid-template-areas: ' "currentTemp conditions high" "currentTemp conditions low" "currentTemp conditions dewpoint" "currentTemp conditions wind" '
+      - grid-template-columns: min-content 50px min-content
+      - grid-template-rows: repeat(7, auto)
+      - gap: 5px 20px
+      - margin: 0 auto
+      - width: fit-content
+      - text-align: left
+      - color: |
+          [[[
+            var weatherData = states['sensor.weather_' + variables.location + '_api'].attributes.currently;
+            var icon = weatherData.icon;
+            var temperature = weatherData.temperature;
+            if (states['binary_sensor.night'].state == "on") {
+                return "#fff ";
+            } else if (icon == "lightning" || icon == "thunderstorm") {
+                return "#fff";
+            } else if (temperature < 10) {
+                return "#000";
+            } else if (temperature < 28) {
+                return "#fff";
+            } else if (temperature < 92) {
+                return "#000";
+            } else {
+                return "#fff";
+            }
+          ]]]
+
+    name:
+      - font-family: var(--ha-card-header-font-family, inherit)
+      - font-size: var(--ha-card-header-font-size, 24px)
+      - letter-spacing: '-0.012em'
+      - line-height: 40px
+      - font-weight: normal
+    custom_fields:
+      currentTemp:
+        - font-size: 72px
+        - font-weight: 300
+      conditions:
+        - text-transform: capitalize
+  tap_action:
+    action: none
