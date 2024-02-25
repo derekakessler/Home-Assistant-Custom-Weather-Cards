@@ -1,0 +1,55 @@
+type: markdown
+content: "{% from 'macros.jinja' import daily_weather_chart %}{{ daily_weather_chart('sensor.weather_home_api') }}"
+card_mod:
+  style:
+    ha-markdown$: |
+      table {
+        text-align: center;
+        overflow: scroll;
+        max-width: 100%;
+        display: grid;
+        text-align: center;
+        grid-template-columns: repeat(8, minmax(100px, 1fr));
+        padding: 16px 0;
+        background-attachment: local;
+        {% from 'macros.jinja' import daily_weather_chart_ribbons %}{{ daily_weather_chart_ribbons('sensor.weather_home_api') }}
+      }
+      tbody, thead, tr {
+        display: contents;
+      }
+      th {
+        opacity: 0.5;
+        font-weight: 400;
+        padding: 0;
+        white-space: pre;
+      }
+      tbody tr:nth-child(1) td {
+        color: var(--forecast-day-color);
+        font-size: 26px;
+        font-weight: 300;
+        padding: 5px 0 5px 10px;
+      }
+      tbody tr:nth-child(2) td {
+        font-size: 16px;
+        font-weight: 200;
+        padding: 0 0 0 5px;
+      }
+      tbody tr:nth-child(4) td ha-icon {
+        transform: scale(.5) translateY(-3px);
+        display: inline-block;
+        margin: -10px -6px;
+      }
+      td {
+        font-size: 12px;
+        padding: 0px;
+        z-index: 1;
+      }
+    .: |
+      ha-card {
+        padding-bottom: 0px;
+        overflow: hidden;
+      }
+      ha-markdown.no-header {
+        overflow: scroll;
+        padding: 0 !important;
+      }
