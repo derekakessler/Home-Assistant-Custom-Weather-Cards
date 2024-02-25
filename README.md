@@ -9,7 +9,7 @@
 - styling:
   - current weather: button-card styles with JS checking the conditions to call a background-image that is overlaid on a color to match the temperature (cold blue to comfortable green to hot red)
   - forecasts: card-mod to apply CSS to the tables and generate swoopy SVG background ribbons of the temperature gradient (daily is highs and lows) and the precipitation accumulation for that period (the vertical lines).
-  - radar: iframe card of Windy.com
+- radar: iframe card of Windy.com
 
 The "Home" tab is a fixed "home" location for a Pirate Weather sensor that updates every 10 minutes. This location never changes.
 
