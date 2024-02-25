@@ -1,0 +1,320 @@
+{% macro daily_weather_chart(source) %}
+  {% set dataset = state_attr(source, 'daily').data -%}
+  {%- for item in dataset -%}
+    {% if loop.first %}Today|{% else %}{{ (item.time|as_datetime|as_local).strftime('%d %a')}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}{%- endif -%}
+  {%- endfor -%}
+
+  {%- for item in dataset -%}
+    {{ "---"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+
+  {%- for item in dataset -%}
+    {{ item.temperatureHigh|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {{ item.temperatureLow|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- if item.icon == "clear-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-sunny"></ha-icon>' -%}
+    {%- elif item.icon == "clear-night" -%}{%- set condition = '<ha-icon icon="mdi:weather-night"></ha-icon>' -%}
+    {%- elif item.icon == "rain" -%}{%- set condition = '<ha-icon icon="mdi:weather-rainy"></ha-icon>' -%}
+    {%- elif item.icon == "snow" -%}{%- set condition = '<ha-icon icon="mdi:weather-snowy"></ha-icon>' -%}
+    {%- elif item.icon == "fog" -%}{%- set condition = '<ha-icon icon="mdi:weather-fog"></ha-icon>' -%}
+    {%- elif item.icon == "sleet" -%}{%- set condition = '<ha-icon icon="mdi:weather-snowy"></ha-icon>' -%}
+    {%- elif item.icon == "wind" -%}{%- set condition = '<ha-icon icon="mdi:weather-windy"></ha-icon>' -%}
+    {%- elif item.icon == "cloudy" -%}{%- set condition = '<ha-icon icon="mdi:weather-cloudy"></ha-icon>' -%}
+    {%- elif item.icon == "partly-cloudy-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-partly-cloudy"></ha-icon>' -%}
+    {%- elif item.icon == "partly-cloudy-night" -%}{%- set condition = '<ha-icon icon="mdi:weather-night-partly-cloudy"></ha-icon>' -%}
+    {%- elif item.icon == "hail" -%}{%- set condition = '<ha-icon icon="mdi:weather-hail"></ha-icon>' -%}
+    {%- elif item.icon == "lightning" -%}{%- set condition = '<ha-icon icon="mdi:weather-lightning"></ha-icon>' -%}
+    {%- elif item.icon == "thunderstorm" -%}{%- set condition = '<ha-icon icon="mdi:weather-lightning-rainy"></ha-icon>' -%}
+    {%- endif -%}
+    {{ condition }}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- set probability = (item.precipProbability * 100)|round -%}
+    {% if probability > 0 -%}
+      {%- if item.precipType == "rain" -%}
+        {%- set icon = ' <ha-icon icon="mdi:water"></ha-icon>' -%}
+      {%- elif item.precipType == "snow" -%}
+        {%- set icon = ' <ha-icon icon="mdi:snowflake"></ha-icon>' -%}
+      {%- elif item.precipType == "hail" -%}
+        {%- set icon = ' <ha-icon icon="mdi:rain"></ha-icon>' -%}
+      {%- else -%}
+        {%- set icon = "" -%}
+      {%- endif -%}
+    {%- else -%}
+      {%- set icon = "" -%}
+    {%- endif -%}
+    {{ icon ~" "~ probability ~ "%"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {{ (item.dewPoint)|round ~ "ᴰᴾ"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+
+  {%- for item in dataset -%}
+    {{ (item.windSpeed)|round ~ "mph"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+{% endmacro %}
+
+{% macro daily_weather_chart_ribbons(source) %}
+  {{ "background-image: " }}
+  {%- set dataset = state_attr(source, 'daily').data -%}
+  {%- set multi = 25 -%}
+  {{ "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 80 100'%3E%3Cdefs%3E %3Cpattern id='pattern' width='0.5' height='10' patternUnits='userSpaceOnUse' %3E %3Cline stroke='hsla(180deg, 100%, 50%, 20%)' stroke-width='0.25px' y2='10px'/%3E %3C/pattern%3E%3C/defs%3E%3Cpath d='M 0,100 L 0," ~ (100-dataset[0].precipAccumulation * multi) ~' S ' }}
+  {%- for item in dataset -%}
+    {%- set precip = item.precipAccumulation * multi -%}
+    {%- if precip > 100 -%}
+      {%- set precip = 100 -%}
+    {%- endif -%}
+    {%- set precip = (100 - precip)|round(2) -%}
+    {%- set index = loop.index -%}
+    {# offset to middle of block #}
+    {%- set horiz = (index * 10 - 5) -%}
+    {%- if loop.first or loop.last -%}
+      {%- set spline = precip -%}
+    {%- else -%}
+      {%- set prevprecip = (100-loop.previtem.precipAccumulation)|round(2) -%}
+      {%- set nextprecip = (100-loop.nextitem.precipAccumulation)|round(2) -%}
+      {%- if (prevprecip < precip < nextprecip) or (prevprecip > precip > nextprecip) -%}
+        {%- set spline = ((prevprecip + precip)/2)|round(2) -%}
+      {%- else -%}
+        {%- set spline = precip -%}
+      {% endif -%}
+    {%- endif -%}
+    {{ (horiz - 3.3) ~"," ~ spline ~" "~ horiz ~","~ precip ~ " "}}
+  {%- endfor -%}
+  {{ '80,'~ (100-dataset[7].precipAccumulation * multi)|round(2) ~' 80,'~ (100-dataset[7].precipAccumulation * multi)|round(2) ~" L 80,100 0,100 Z' stroke='none' fill='url(%23pattern)' %3E%3C/path%3E%3C/svg%3E\"), " }}
+  {{ "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 80 100'%3E%3Cdefs%3E%3ClinearGradient id='gradient' gradientTransform='rotate(90)'%3E" }}
+  {%- set gradsect = 100 / dataset|count -%}
+  {%- set tempRanges = namespace(temps=[]) -%}
+  {%- for item in dataset -%}
+    {%- set tempRanges.temps = tempRanges.temps + [item.temperatureHigh, item.temperatureLow] -%}
+  {%- endfor -%}
+  {%- set tempMax = tempRanges.temps|max -%}
+  {%- if tempMax > 100 -%}
+    {%- set tempMax = 100 -%}
+  {%- elif tempMax < 1 -%}
+    {%- set tempMax = 1 -%}
+  {%- endif -%}
+  {%- set tempMin = tempRanges.temps|min -%}
+  {%- if tempMin > 100 -%}
+    {%- set tempMin = 100 -%}
+  {%- elif tempMin < 1 -%}
+    {%- set tempMin = 1 -%}
+  {%- endif -%}
+  {%- set tempRange = tempMax - tempMin -%}
+  {%- set tempStep = tempRange / 8 * 2.5 -%}
+  {%- set hueMin = ((100 - tempMin) * 2.5)|round -%}
+  {%- set hueMax = ((100 - tempMax) * 2.5)|round -%}
+  {%- for i in range (0,9) -%}
+    {%- set hue = (hueMax + i * tempStep)|round -%}
+    {%- set vert = (i * 12.5)|round -%}
+    {{ "%3Cstop offset='" ~ vert ~"%25' stop-color='hsla(" ~ hue ~ ",100%25,50%25,0.25)'%3E%3C/stop%3E" }}
+  {%- endfor -%}
+  {{ "%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0," ~ (100-dataset[0].temperatureHigh) ~' S ' }}
+  {%- for item in dataset -%}
+    {%- set temp = item.temperatureHigh -%}
+    {%- if temp > 100 -%}
+      {%- set temp = 100 -%}
+    {%- elif temp < 1 -%}
+      {%- set temp = 1 -%}
+    {%- endif -%}
+    {%- set temp = (100 - temp)|round(2) -%}
+    {%- set index = loop.index -%}
+    {# offset to middle of block #}
+    {%- set horiz = (index * 10 - 5) -%}
+    {%- if loop.first or loop.last -%}
+      {%- set spline = temp -%}
+    {%- else -%}
+      {%- set prevtemp = (100-loop.previtem.temperatureHigh)|round(2) -%}
+      {%- set nexttemp = (100-loop.nextitem.temperatureHigh)|round(2) -%}
+      {%- if (prevtemp < temp < nexttemp) or (prevtemp > temp > nexttemp) -%}
+        {%- set spline = ((prevtemp + temp)/2)|round(2) -%}
+      {%- else -%}
+        {%- set spline = temp -%}
+      {% endif -%}
+    {%- endif -%}
+    {{ (horiz - 2.5) ~"," ~ spline ~" "~ horiz ~","~ temp ~ " "}}
+  {%- endfor -%}
+  {{ '80,'~ (100-dataset[7].temperatureHigh)|round(2) ~' 80,'~ (100-dataset[7].temperatureHigh)|round(2) ~" L 80," ~ (100-dataset[7].temperatureLow)|round(2) ~ " S " }}
+  {%- for item in dataset|reverse -%}
+    {%- set temp = item.temperatureLow -%}
+    {%- if temp > 100 -%}
+      {%- set temp = 100 -%}
+    {%- elif temp < 1 -%}
+      {%- set temp = 1 -%}
+    {%- endif -%}
+    {%- set temp = (100 - temp)|round(2) -%}
+    {%- set index = dataset|count - loop.index -%}
+    {# offset to middle of block #}
+    {%- set horiz = (index * 10 + 5) -%}
+    {%- if loop.first or loop.last -%}
+      {%- set spline = temp -%}
+    {%- else -%}
+      {%- set prevtemp = (100-loop.previtem.temperatureLow)|round(2) -%}
+      {%- set nexttemp = (100-loop.nextitem.temperatureLow)|round(2) -%}
+      {%- if (prevtemp < temp < nexttemp) or (prevtemp > temp > nexttemp) -%}
+        {%- set spline = ((prevtemp + temp)/2)|round(2) -%}
+      {%- else -%}
+        {%- set spline = temp -%}
+      {% endif -%}
+    {%- endif -%}
+    {{ (horiz + 2.5) ~"," ~ spline ~" "~ horiz ~","~ temp ~ " "}}
+  {%- endfor -%}
+  {{ '0,'~ (100-dataset[0].temperatureLow)|round(2) ~' 0,'~ (100-dataset[0].temperatureLow)|round(2) ~" L 0," ~ (100-dataset[0].temperatureLow)|round(2) ~ " Z' stroke='none' fill='url(%23gradient)'%3E%3C/path%3E%3C/svg%3E\");" }}
+{% endmacro %}
+
+{% macro hourly_weather_chart(source) %}
+  {% set dataset = state_attr(source, 'hourly').data -%}
+  {%- for item in dataset -%}
+    {%- if loop.first -%}Now|
+    {%- else -%}
+      {%- if (item.time|as_datetime|as_local).strftime('%H') == "00" -%}{{(item.time|as_datetime|as_local).strftime('%a')}}
+      {%- else -%}{{ (item.time|as_datetime|as_local).strftime('%H')}}
+      {%- endif -%}
+      {%- if not loop.last -%}|
+      {%- else -%}{{"\n"}}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {{ "---"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- if loop.first -%}
+      {{ state_attr(source, 'currently').temperature|round ~ "º |" }}
+    {%- else -%}
+      {{ item.temperature|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+    {%- endif -%}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- if item.icon == "clear-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-sunny"></ha-icon>' -%}
+    {%- elif item.icon == "clear-night" -%}{%- set condition = '<ha-icon icon="mdi:weather-night"></ha-icon>' -%}
+    {%- elif item.icon == "rain" -%}{%- set condition = '<ha-icon icon="mdi:weather-rainy"></ha-icon>' -%}
+    {%- elif item.icon == "snow" -%}{%- set condition = '<ha-icon icon="mdi:weather-snowy"></ha-icon>' -%}
+    {%- elif item.icon == "fog" -%}{%- set condition = '<ha-icon icon="mdi:weather-fog"></ha-icon>' -%}
+    {%- elif item.icon == "sleet" -%}{%- set condition = '<ha-icon icon="mdi:weather-snowy"></ha-icon>' -%}
+    {%- elif item.icon == "wind" -%}{%- set condition = '<ha-icon icon="mdi:weather-windy"></ha-icon>' -%}
+    {%- elif item.icon == "cloudy" -%}{%- set condition = '<ha-icon icon="mdi:weather-cloudy"></ha-icon>' -%}
+    {%- elif item.icon == "partly-cloudy-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-partly-cloudy"></ha-icon>' -%}
+    {%- elif item.icon == "partly-cloudy-night" -%}{%- set condition = '<ha-icon icon="mdi:weather-night-partly-cloudy"></ha-icon>' -%}
+    {%- elif item.icon == "hail" -%}{%- set condition = '<ha-icon icon="mdi:weather-hail"></ha-icon>' -%}
+    {%- elif item.icon == "lightning" -%}{%- set condition = '<ha-icon icon="mdi:weather-lightning"></ha-icon>' -%}
+    {%- elif item.icon == "thunderstorm" -%}{%- set condition = '<ha-icon icon="mdi:weather-lightning-rainy"></ha-icon>' -%}
+    {%- endif -%}
+    {{ condition }}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- set probability = (item.precipProbability * 100)|round -%}
+    {% if probability > 0 -%}
+      {%- if item.precipType == "rain" -%}
+        {%- set icon = ' <ha-icon icon="mdi:water"></ha-icon>' -%}
+      {%- elif item.precipType == "snow" -%}
+        {%- set icon = ' <ha-icon icon="mdi:snowflake"></ha-icon>' -%}
+      {%- elif item.precipType == "hail" -%}
+        {%- set icon = ' <ha-icon icon="mdi:rain"></ha-icon>' -%}
+      {%- else -%}
+        {%- set icon = "" -%}
+      {%- endif -%}
+    {%- else -%}
+      {%- set icon = "" -%}
+    {%- endif -%}
+    {{ icon ~" "~ probability ~ "%"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- if loop.first -%}
+      {{ state_attr(source, 'currently').dewPoint|round ~ "ᴰᴾ |" }}
+    {%- else -%}
+      {{ (item.dewPoint)|round ~ "ᴰᴾ"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+    {%- endif -%}
+  {%- endfor -%}
+  
+  {%- for item in dataset -%}
+    {%- if loop.first -%}
+      {{ state_attr(source, 'currently').windSpeed|round ~ "mph |" }}
+    {%- else -%}
+      {{ (item.windSpeed)|round ~ "mph"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+    {%- endif -%}
+  {%- endfor -%}
+{% endmacro %}
+
+{% macro hourly_weather_chart_ribbons(source) %}
+  {{ "background-image: " }}
+  {%- set dataset = state_attr(source, 'hourly').data -%}
+  {%- set multi = 1000 -%}
+  {{ "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 480 100'%3E%3Cdefs%3E %3Cpattern id='pattern' width='1' height='10' patternUnits='userSpaceOnUse' %3E %3Cline stroke='hsla(180deg, 100%, 50%, 20%)' stroke-width='0.5px' y2='10px'/%3E %3C/pattern%3E%3C/defs%3E%3Cpath d='M 0,100 L 0," ~ (100-dataset[0].precipAccumulation * multi) ~' S ' }}
+  {%- for item in dataset -%}
+    {%- set precip = item.precipAccumulation * multi -%}
+    {%- if precip > 100 -%}
+      {%- set precip = 100 -%}
+    {%- endif -%}
+    {%- set precip = (100 - precip)|round(2) -%}
+    {%- set index = loop.index -%}
+    {# offset to middle of block #}
+    {%- set horiz = (index * 10 - 5) -%}
+    {%- if loop.first or loop.last -%}
+      {%- set spline = precip -%}
+    {%- else -%}
+      {%- set prevprecip = (100-loop.previtem.precipAccumulation)|round(2) -%}
+      {%- set nextprecip = (100-loop.nextitem.precipAccumulation)|round(2) -%}
+      {%- if (prevprecip < precip < nextprecip) or (prevprecip > precip > nextprecip) -%}
+        {%- set spline = ((prevprecip + precip)/2)|round(2) -%}
+      {%- else -%}
+        {%- set spline = precip -%}
+      {% endif -%}
+    {%- endif -%}
+    {{ (horiz - 3.3) ~"," ~ spline ~" "~ horiz ~","~ precip ~ " "}}
+  {%- endfor -%}
+  {{ '480,'~ (100-dataset[47].precipAccumulation * multi)|round(2) ~' 480,'~ (100-dataset[47].precipAccumulation * multi)|round(2) ~" L 480,100 0,100 Z' stroke='none' fill='url(%23pattern)' %3E%3C/path%3E%3C/svg%3E\")," }}
+  {{ "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' viewBox='0 0 480 100'%3E%3Cdefs%3E%3ClinearGradient id='gradient'%3E" }}
+  {%- set gradsect = 100 / dataset|count -%}
+  {%- for item in dataset -%}
+    {%- set horiz = (loop.index * gradsect - gradsect/2)|round(1) -%}
+    {%- set temp = item.temperature -%}
+    {%- if temp > 100 -%}
+      {%- set temp = 100 -%}
+    {%- elif temp < 1 -%}
+      {%- set temp = 1 -%}
+    {%- endif -%}
+    {%- set hue = ((100 - temp) * 2.5)|round -%}
+    {{ "%3Cstop offset='" ~ horiz ~"%25' stop-color='hsla(" ~ hue ~ ",100%25,50%25,0.33)'%3E%3C/stop%3E" }}
+  {%- endfor -%}
+  {{ "%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0,100 L 0," ~ (100-dataset[0].temperature) ~' S ' }}
+  {%- for item in dataset -%}
+    {%- set temp = item.temperature -%}
+    {# minmax temps #}
+    {%- if temp > 100 -%}
+      {%- set temp = 100 -%}
+    {%- elif temp < 1 -%}
+      {%- set temp = 1 -%}
+    {%- endif -%}
+    {# invert temp #}
+    {%- set temp = (100 - temp)|round(2) -%}
+    {%- set index = loop.index -%}
+    {# offset to middle of block #}
+    {%- set horiz = (index * 10 - 5) -%}
+    {%- if loop.first or loop.last -%}
+      {%- set spline = temp -%}
+    {%- else -%}
+      {%- set prevtemp = (100-loop.previtem.temperature)|round(2) -%}
+      {%- set nexttemp = (100-loop.nextitem.temperature)|round(2) -%}
+      {%- if (prevtemp > temp > nexttemp) or  (prevtemp < temp < nexttemp) -%}
+        {%- set spline = ((prevtemp + temp)/2)|round(2) -%}
+      {%- else -%}
+        {%- set spline = prevtemp -%}
+      {% endif -%}
+    {%- endif -%}
+    {{ (horiz - 2.5) ~"," ~ spline ~" "~ horiz ~","~ temp ~ " "}}
+  {%- endfor -%}
+  {{ '480,'~ (100-dataset[47].temperature)|round(2) ~' 480,'~ (100-dataset[47].temperature)|round(2) ~" L 480,100 Z' stroke='none' fill='url(%23gradient)'%3E%3C/path%3E%3C/svg%3E\");" }}
+{% endmacro %}
