@@ -24,11 +24,11 @@ This is all driven by the Pirate Weather sensor attributes and the incredible am
 ### Dependencies
 
 - Home Assistant
-  - GPS-based device_tracker in Home Assistant (for local weather coordinates)
+  - [GPS-based device_tracker](https://www.home-assistant.io/integrations/device_tracker/) (for local coordinates)
   - [Pirate Weather](https://pirate-weather.apiable.io/) account and API key (HA integration not needed)
   - [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities)
   - [Button Card](https://github.com/custom-cards/button-card)
   - [Card Mod](https://github.com/thomasloven/lovelace-card-mod)
   - [Layout Card](https://github.com/thomasloven/lovelace-layout-card)
-- [Node-Red](https://github.com/hassio-addons/addon-node-red)
+- [Node-Red](https://github.com/hassio-addons/addon-node-red) (for search coordinates)
   - [node-red-node-google](https://flows.nodered.org/node/node-red-node-google)
