@@ -1,7 +1,7 @@
 rest:
   - authentication: basic
     scan_interval: 600
-    resource: 'https://api.pirateweather.net/forecast/<API-KEY>/39.155985815671116,-84.47303847702554'
+    resource: 'https://api.pirateweather.net/forecast/<API-KEY>/<HOME-LATITUDE>,<HOME-LONGITUDE>'
     sensor:
       - name: "Weather Home API"
         icon: mdi:code-json
