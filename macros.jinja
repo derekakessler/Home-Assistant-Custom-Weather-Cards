@@ -9,11 +9,11 @@
   {%- endfor -%}
 
   {%- for item in dataset -%}
-    {{ item.temperatureHigh|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+    {{ item.temperatureMax|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
   {%- endfor -%}
   
   {%- for item in dataset -%}
-    {{ item.temperatureLow|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
+    {{ item.temperatureMin|round ~ "º"}}{% if not loop.last %}|{% else %}{{"\n"}}{% endif %}
   {%- endfor -%}
   
   {%- for item in dataset -%}
@@ -93,7 +93,7 @@
   {%- set gradsect = 100 / dataset|count -%}
   {%- set tempRanges = namespace(temps=[]) -%}
   {%- for item in dataset -%}
-    {%- set tempRanges.temps = tempRanges.temps + [item.temperatureHigh, item.temperatureLow] -%}
+    {%- set tempRanges.temps = tempRanges.temps + [item.temperatureMax, item.temperatureMin] -%}
   {%- endfor -%}
   {%- set tempMax = tempRanges.temps|max -%}
   {%- if tempMax > 100 -%}
@@ -116,9 +116,9 @@
     {%- set vert = (i * 12.5)|round -%}
     {{ "%3Cstop offset='" ~ vert ~"%25' stop-color='hsla(" ~ hue ~ ",100%25,50%25,0.25)'%3E%3C/stop%3E" }}
   {%- endfor -%}
-  {{ "%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0," ~ (100-dataset[0].temperatureHigh) ~' S ' }}
+  {{ "%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 0," ~ (100-dataset[0].temperatureMax) ~' S ' }}
   {%- for item in dataset -%}
-    {%- set temp = item.temperatureHigh -%}
+    {%- set temp = item.temperatureMax -%}
     {%- if temp > 100 -%}
       {%- set temp = 100 -%}
     {%- elif temp < 1 -%}
@@ -131,8 +131,8 @@
     {%- if loop.first or loop.last -%}
       {%- set spline = temp -%}
     {%- else -%}
-      {%- set prevtemp = (100-loop.previtem.temperatureHigh)|round(2) -%}
-      {%- set nexttemp = (100-loop.nextitem.temperatureHigh)|round(2) -%}
+      {%- set prevtemp = (100-loop.previtem.temperatureMax)|round(2) -%}
+      {%- set nexttemp = (100-loop.nextitem.temperatureMax)|round(2) -%}
       {%- if (prevtemp < temp < nexttemp) or (prevtemp > temp > nexttemp) -%}
         {%- set spline = ((prevtemp + temp)/2)|round(2) -%}
       {%- else -%}
@@ -141,9 +141,9 @@
     {%- endif -%}
     {{ (horiz - 2.5) ~"," ~ spline ~" "~ horiz ~","~ temp ~ " "}}
   {%- endfor -%}
-  {{ '80,'~ (100-dataset[7].temperatureHigh)|round(2) ~' 80,'~ (100-dataset[7].temperatureHigh)|round(2) ~" L 80," ~ (100-dataset[7].temperatureLow)|round(2) ~ " S " }}
+  {{ '80,'~ (100-dataset[7].temperatureMax)|round(2) ~' 80,'~ (100-dataset[7].temperatureMax)|round(2) ~" L 80," ~ (100-dataset[7].temperatureMin)|round(2) ~ " S " }}
   {%- for item in dataset|reverse -%}
-    {%- set temp = item.temperatureLow -%}
+    {%- set temp = item.temperatureMin -%}
     {%- if temp > 100 -%}
       {%- set temp = 100 -%}
     {%- elif temp < 1 -%}
@@ -156,8 +156,8 @@
     {%- if loop.first or loop.last -%}
       {%- set spline = temp -%}
     {%- else -%}
-      {%- set prevtemp = (100-loop.previtem.temperatureLow)|round(2) -%}
-      {%- set nexttemp = (100-loop.nextitem.temperatureLow)|round(2) -%}
+      {%- set prevtemp = (100-loop.previtem.temperatureMin)|round(2) -%}
+      {%- set nexttemp = (100-loop.nextitem.temperatureMin)|round(2) -%}
       {%- if (prevtemp < temp < nexttemp) or (prevtemp > temp > nexttemp) -%}
         {%- set spline = ((prevtemp + temp)/2)|round(2) -%}
       {%- else -%}
@@ -166,7 +166,7 @@
     {%- endif -%}
     {{ (horiz + 2.5) ~"," ~ spline ~" "~ horiz ~","~ temp ~ " "}}
   {%- endfor -%}
-  {{ '0,'~ (100-dataset[0].temperatureLow)|round(2) ~' 0,'~ (100-dataset[0].temperatureLow)|round(2) ~" L 0," ~ (100-dataset[0].temperatureLow)|round(2) ~ " Z' stroke='none' fill='url(%23gradient)'%3E%3C/path%3E%3C/svg%3E\");" }}
+  {{ '0,'~ (100-dataset[0].temperatureMin)|round(2) ~' 0,'~ (100-dataset[0].temperatureMin)|round(2) ~" L 0," ~ (100-dataset[0].temperatureMin)|round(2) ~ " Z' stroke='none' fill='url(%23gradient)'%3E%3C/path%3E%3C/svg%3E\");" }}
 {% endmacro %}
 
 {% macro hourly_weather_chart(source) %}
