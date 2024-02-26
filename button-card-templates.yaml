@@ -5,9 +5,9 @@ weather:
     currentTemp: >
       [[[ return Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.currently.temperature) + 'º']]]
     high: >
-      [[[ return 'High: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureHigh) + 'º' ]]]
+      [[[ return 'High: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureMax) + 'º' ]]]
     low: >
-      [[[ return 'Low: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureLow) + 'º' ]]]
+      [[[ return 'Low: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureMin) + 'º' ]]]
     conditions: >
       [[[
         const iconMap = {
