@@ -82,6 +82,8 @@ weather:
                 icon == "partly-cloudy-day" ||
                 icon == "partly-cloudy-night") {
                 return "screen";
+            } else if (icon == "rain") {
+                return "difference";
             } else if (icon == "lightning" || icon == "thunderstorm") {
                 return "none";
             } else if (temperature < 10) {
