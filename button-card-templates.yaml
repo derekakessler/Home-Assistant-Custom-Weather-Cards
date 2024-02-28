@@ -10,24 +10,27 @@ weather:
       [[[ return 'Low: ' + Math.round(states['sensor.weather_' + variables.location + '_api'].attributes.daily.data[0].temperatureMin) + 'º' ]]]
     conditions: >
       [[[
-        const iconMap = {
-            "clear-day": "mdi:weather-sunny",
-            "clear-night": "mdi:weather-night",
-            "rain": "mdi:weather-rainy",
-            "snow": "mdi:weather-snowy",
-            "fog": "mdi:weather-fog",
-            "sleet": "mdi:weather-snowy",
-            "wind": "mdi:weather-windy",
-            "cloudy": "mdi:weather-cloudy",
-            "partly-cloudy-day": "mdi:weather-partly-cloudy",
-            "partly-cloudy-night": "mdi:weather-night-partly-cloudy",
-            "hail": "mdi:weather-hail",
-            "lightning": "mdi:weather-lightning",
-            "thunderstorm": "mdi:weather-lightning-rainy"
-        };
-        const icon = states['sensor.weather_' + variables.location + '_api'].attributes.currently.icon;
-        const condition = iconMap[icon] ? `<ha-icon icon="${iconMap[icon]}"></ha-icon>` : '';
-        return condition;
+        if (states['sensor.weather_' + variables.location + '_api'].attributes.currently.windSpeed >= 15 && ["clear-day", "clear-night", "cloudy", "partly-cloudy-day", "partly-cloudy-night"].includes(states['sensor.weather_' + variables.location + '_api'].attributes.currently.icon)) return `<ha-icon icon="mdi:weather-windy"></ha-icon>`;
+        else {
+          const iconMap = {
+              "clear-day": "mdi:weather-sunny",
+              "clear-night": "mdi:weather-night",
+              "rain": "mdi:weather-rainy",
+              "snow": "mdi:weather-snowy",
+              "fog": "mdi:weather-fog",
+              "sleet": "mdi:weather-snowy",
+              "wind": "mdi:weather-windy",
+              "cloudy": "mdi:weather-cloudy",
+              "partly-cloudy-day": "mdi:weather-partly-cloudy",
+              "partly-cloudy-night": "mdi:weather-night-partly-cloudy",
+              "hail": "mdi:weather-hail",
+              "lightning": "mdi:weather-lightning",
+              "thunderstorm": "mdi:weather-lightning-rainy"
+          };
+          const icon = states['sensor.weather_' + variables.location + '_api'].attributes.currently.icon;
+          const condition = iconMap[icon] ? `<ha-icon icon="${iconMap[icon]}"></ha-icon>` : '';
+          return condition;
+        }
       ]]]
     dewpoint: >
       [[[ return 'Dewpoint: ' + Math.round(states['sensor.weather_' + variables.location +
