@@ -17,7 +17,9 @@
   {%- endfor -%}
   
   {%- for item in dataset -%}
-    {%- if item.icon == "clear-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-sunny"></ha-icon>' -%}
+    {%- set windyOverride = ["clear-day", "clear-night", "cloudy", "partly-cloudy-day", "partly-cloudy-night"] -%}
+    {%- if item.windSpeed >= 15 and item.icon in windyOverride -%}{%- set condition = '<ha-icon icon="mdi:weather-windy"></ha-icon>' -%}
+    {%- elif item.icon == "clear-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-sunny"></ha-icon>' -%}
     {%- elif item.icon == "clear-night" -%}{%- set condition = '<ha-icon icon="mdi:weather-night"></ha-icon>' -%}
     {%- elif item.icon == "rain" -%}{%- set condition = '<ha-icon icon="mdi:weather-rainy"></ha-icon>' -%}
     {%- elif item.icon == "snow" -%}{%- set condition = '<ha-icon icon="mdi:weather-snowy"></ha-icon>' -%}
@@ -196,7 +198,9 @@
   {%- endfor -%}
   
   {%- for item in dataset -%}
-    {%- if item.icon == "clear-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-sunny"></ha-icon>' -%}
+    {%- set windyOverride = ["clear-day", "clear-night", "cloudy", "partly-cloudy-day", "partly-cloudy-night"] -%}
+    {%- if item.windSpeed >= 15 and item.icon in windyOverride -%}{%- set condition = '<ha-icon icon="mdi:weather-windy"></ha-icon>' -%}
+    {%- elif item.icon == "clear-day" -%}{%- set condition = '<ha-icon icon="mdi:weather-sunny"></ha-icon>' -%}
     {%- elif item.icon == "clear-night" -%}{%- set condition = '<ha-icon icon="mdi:weather-night"></ha-icon>' -%}
     {%- elif item.icon == "rain" -%}{%- set condition = '<ha-icon icon="mdi:weather-rainy"></ha-icon>' -%}
     {%- elif item.icon == "snow" -%}{%- set condition = '<ha-icon icon="mdi:weather-snowy"></ha-icon>' -%}
